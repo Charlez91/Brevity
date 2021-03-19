@@ -1,2 +1,0 @@
-# Brevity
-A blog site.
