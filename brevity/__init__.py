@@ -12,6 +12,7 @@ from flask_login import LoginManager
 
 app = Flask(__name__)                                  #
 app.config['SECRET_KEY'] = '2bbc32e8acb5196b47281166ae43eeb2'                 #secrets.token_hex(16)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False    #supresses warning
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
