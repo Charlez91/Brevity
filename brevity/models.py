@@ -24,7 +24,7 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"  
                                                                                     #posts works like a pseudo column. It runs additional query on the Post table to get a list of all the posts made by a user
-                                                                                    #author can be used in Post object.
+                                                                                    #author can be used in Post object and it returns a User object.
 
 
 class Post(db.Model):
@@ -36,4 +36,4 @@ class Post(db.Model):
                                                                                     
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
-                                                                                    #author can be used in Post object.
+                                                                                    #author can be used in Post object and it returns a User object.
