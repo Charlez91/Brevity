@@ -4,36 +4,48 @@ When the package is imported,
 
 If we import something from __init__.py module then no need to write "from brevity.__init__ import x".
     writing "from brevity import x" is enough.
-'''  
-import os                                                                          
+'''                                                                           
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
+from brevity.config import Config
 
-app = Flask(__name__)                                  
-app.config['SECRET_KEY'] = '2bbc32e8acb5196b47281166ae43eeb2'            #secrets.token_hex(16)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False    #supresses warning
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
-app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
 
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'                      #when a user attempts to access a login_required view without being logged in,
-                                                        #   Flask-Login will flash a message and redirect them to the log in view. 
+db = SQLAlchemy()
+bcrypt = Bcrypt()
+login_manager = LoginManager()
+login_manager.login_view = 'users.login'                #when a user attempts to access a login_required view without being logged in,                                                        #   Flask-Login will flash a message and redirect them to the log in view. 
 login_manager.login_message_category = 'info'
+mail = Mail()
 
-mail = Mail(app)
+                                                        #init_app() - this method is written inside each extension. The init_app method exists so that the extension object (e.g. flask_login object) can be instantiated without requiring an app object. 
 
-from brevity import routes          
-'''
+def create_app(config_class=Config):
+    app = Flask(__name__)                                  
+    app.config.from_object(config_class)
+
+    db.init_app(app)
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
+    mail.init_app(app)
+
+    from brevity.users.routes import users
+    from brevity.posts.routes import posts  
+    from brevity.main.routes import main  
+    app.register_blueprint(users)
+    app.register_blueprint(posts)
+    app.register_blueprint(main)
+
+    return app
+
+''' 
+Before using Blueprint:
 route imports app. So we first initialize app then import routes.
 So that we can avoid circular import.
+
+After using Blueprints:
+route doesn't import app. We just have to register the blueprints of the routes to the app.
 '''
    
